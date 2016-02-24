@@ -1,1 +1,15 @@
-#map {height:400px;}
+#map {height:800px;
+width: 100%;
+display: inline-block;}
+
+.leaflet-popup-content p {
+    margin: 0em 0;
+
+}
+
+#panel {
+    width: 16%;
+    padding: 20px;
+    display: inline-block;
+    vertical-align: top;
+}

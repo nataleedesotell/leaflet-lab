@@ -2,8 +2,8 @@
 function createMap(){
     //create the map with a particular center and zoom
     var map = L.map('map', {
-        center: [20, 0],
-        zoom: 2
+        center: [21, 82],
+        zoom: 5
     });
     //add OSM base tilelayer
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -16,9 +16,58 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
 }).addTo(map);
 
-
     //call getData function
     getData(map);
+};
+
+function pointToLayer(feature, latlng) {
+    var attribute = "NORM2003";
+    var options = {
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+
+    var attValue = Number(feature.properties[attribute]);
+    options.radius = calcPropRadius(attValue);
+    var layer = L.circleMarker(latlng, options);
+    //build popup content string starting with city...Example 2.1 line 24
+    var popupContent = "<p><b>State:</b> " + feature.properties.STATES+ "</p>";
+
+    //add formatted attribute to popup content string
+    var year = attribute.split("_")[1];
+    popupContent += "<p><b>Road Accident Injuries in " + 2003 + ":</b> " + Math.round(feature.properties[attribute]) + " per 100,000 people</p>";
+    layer.bindPopup(popupContent, {
+        offset: new L.Point(0, -options.radius)
+    });
+
+    layer.on({
+        mouseover: function() {
+            this.openPopup();
+        },
+        mouseout: function(){
+            this.closePopup();
+        }
+    });
+    return layer;
+
+};
+
+function calcPropRadius(attValue) {
+    var scaleFactor = 20;
+    var area = attValue*scaleFactor;
+    var radius = Math.sqrt (area/Math.PI);
+    return radius;
+};
+
+function createPropSymbols(data, map) {
+    //create marker options
+
+    L.geoJson (data, {
+        pointToLayer: pointToLayer
+    }).addTo(map);
 };
 
 //function to retrieve the data and place it on the map
@@ -30,39 +79,10 @@ function getData(map){
         dataType: "json",
         //in the case of a success, run this function:
         success: function(response){
-            //specify the specs of the circle symbols for each city
-            var geojsonMarkerOptions = {
-                //specifies the radius for the marker
-                radius: 6,
-                //specifies a coral fill color for the marker
-                fillColor: "#FF7F50",
-                //color for the marker
-                color: "#000",
-                //weight of the marker
-                weight: 2,
-                //opacity of the marker
-                opacity: 2,
-                //opacity of the fill
-                fillOpacity: 0.7
-            };
-
-            //create a Leaflet GeoJSON layer and add it to the map
-            L.geoJson(response, {
-                //passes pointToLayer function while creating layer
-                pointToLayer: function (feature, latlng){
-                    //should return a circlemarker
-                    return L.circleMarker(latlng, geojsonMarkerOptions);
-                }
-                //add this to the map
-            }).addTo(map);
-            
-
-            //create a Leaflet GeoJSON layer and add it to the map
-        }
-    });
-};
-
-
+            createPropSymbols (response, map);
+            }
+        })
+    };
 
 $(document).ready(createMap);
 
