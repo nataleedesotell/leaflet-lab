@@ -10,12 +10,11 @@ function createMap(){
     //describes layer data
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
     //the max level of zoom allowed
-    maxZoom: 18,
+    maxZoom: 6,
     //my unique id and accessToken
     id:'nataleedesotell.p8942221',
     accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
 }).addTo(map);
-
     //call getData function
     getData(map);
 };
