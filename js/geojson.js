@@ -20,6 +20,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     getData(map);
 };
 
+
 function pointToLayer(feature, latlng) {
     var attribute = "NORM2003";
     var options = {
@@ -49,10 +50,44 @@ function pointToLayer(feature, latlng) {
         },
         mouseout: function(){
             this.closePopup();
+        },
+        click: function() {
+            $("#panel").html(popupContent)
         }
     });
     return layer;
 
+};
+
+function createSequenceControls(map){
+    //create range input element (slider)
+    $('#panel').append('<input class="range-slider" type="range">');
+    $('.range-slider').attr({
+        max: 9,
+        min: 0,
+        value: 0,
+        step: 1
+
+    });
+
+    $('#panel').append('<button class="skip" id="reverse">Reverse</button>');
+    $('#panel').append('<button class="skip" id="forward">Skip</button>');
+
+};
+
+
+function processData(data) {
+    //set up empty array called attributes
+    var attributes = [];
+    var properties = data.features[0];
+    for (var attribute in properties) {
+        if (attribute.indexOf("NORM") > -1) {
+            attributes.push(attribute);
+        };
+    };
+
+    console.log(attributes);
+    return attributes;
 };
 
 function calcPropRadius(attValue) {
@@ -79,7 +114,9 @@ function getData(map){
         dataType: "json",
         //in the case of a success, run this function:
         success: function(response){
-            createPropSymbols (response, map);
+            var attributes = processData(response);
+            createPropSymbols (response, map, attributes);
+            createSequenceControls(map, attrinbutes);
             }
         })
     };

@@ -8,8 +8,15 @@ display: inline-block;}
 }
 
 #panel {
-    width: 16%;
+    width: 30%;
     padding: 20px;
     display: inline-block;
     vertical-align: top;
+    text-align: center;
+    line-height: 50px;
 }
+
+.range-slider {
+	width: 60%;
+}
+
