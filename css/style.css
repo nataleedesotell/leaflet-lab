@@ -8,15 +8,21 @@ display: inline-block;}
 }
 
 #panel {
-    width: 30%;
-    padding: 15px;
+    width: 20%;
+    padding: 0px;
     display: inline-block;
     vertical-align: top;
     text-align: center;
-    line-height: 50px;
+    line-height: 40px;
 }
 
 .range-slider {
 	width: 60%;
 }
+#forward {
+    float: right;
+}
 
+#reverse {
+    float: left;
+}

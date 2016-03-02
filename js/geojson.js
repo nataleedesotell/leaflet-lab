@@ -20,9 +20,11 @@ function createMap(){
 };
 
 //add a point to layer with parameters feature & lat long
-function pointToLayer(feature, latlng) {
+function pointToLayer(feature, latlng, attributes) {
     //attribute we're using for the point's value
-    var attribute = "NORM2003";
+    var attribute = attributes[0];
+    //check
+    console.log(attribute);
     //customize what the point looks like
     var options = {
         fillColor: "#FFA824",
@@ -78,19 +80,49 @@ function createSequenceControls(map){
         step: 1
 
     });
-    //add a reverse button
+
     $('#panel').append('<button class="skip" id="reverse">Reverse</button>');
-    ///add a skip button
     $('#panel').append('<button class="skip" id="forward">Skip</button>');
+    //add a reverse button
+    $('#reverse').html('<img src="img/back.png">');
+    ///add a skip button
+    $('#forward').html('<img src="img/forward.png">');
+
+
+    $('.skip').click(function(){
+        //sequence
+        //get the old index value
+         var index = $('.range-slider').val();
+
+
+        if ($(this).attr('id') == 'forward'){
+            index++;
+            //Step 7: if past the last attribute, wrap around to first attribute
+            index = index > 8 ? 0 : index;
+        } else if ($(this).attr('id') == 'reverse'){
+            index--;
+            //Step 7: if past the first attribute, wrap around to last attribute
+            index = index < 0 ? 8 : index;
+        };
+
+    });
+
+
+
+    //Step 5: input listener for slider
+    $('.range-slider').on('input', function(){
+        //sequence
+        var index = $(this).val();
+    });
 
 };
 
 //set up a new function for processing data (where we'll loop thru NORM attributes)
 function processData(data) {
-    //set up empty array called attributes
+    //set up empty array to hold attributes
     var attributes = [];
     //set up variable properties 
-    var properties = data.features[0];
+    var properties = data.features[0].properties;
     //any attribute in properties in the geojson file
     for (var attribute in properties) {
         //when "NORM" is found (>-1)
@@ -99,11 +131,10 @@ function processData(data) {
             attributes.push(attribute);
         };
     };
-    //print to the console
-    console.log(attributes);
     //push these values to the map
     return attributes;
 };
+
 //set up function to calculate our proportions
 function calcPropRadius(attValue) {
     //variable scaleFactor is a constant, 50
@@ -116,11 +147,13 @@ function calcPropRadius(attValue) {
     return radius;
 };
 //set up function to create our proportional symbols
-function createPropSymbols(data, map) {
+function createPropSymbols(data, map, attributes) {
     //create marker options
     L.geoJson (data, {
         //all the code for this can be found in pointToLayer function so it points there
-        pointToLayer: pointToLayer
+        pointToLayer: function(feature, latlng) {
+            return pointToLayer(feature, latlng, attributes);
+        }
         //add them to the map
     }).addTo(map);
 };
@@ -143,6 +176,12 @@ function getData(map){
             }
         })
     };
+
+
+///FIFTH INTERACTION OPERATOR///
+
+
+
 
 $(document).ready(createMap);
 
