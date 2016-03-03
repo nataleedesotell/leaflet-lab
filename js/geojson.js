@@ -1,3 +1,7 @@
+var attributes = [];
+
+
+
 //function to instantiate Leaflet map
 function createMap(){
     //create the map with a particular center and zoom
@@ -70,7 +74,6 @@ function pointToLayer(feature, latlng, attributes) {
 }
 //Step 1: Create new sequence controls
 function createSequenceControls(map){
-    console.log("made it to createSequenceControls"); //success
     //create range input element (slider)
     $('#panel').append('<input class="range-slider" type="range">');
     
@@ -104,7 +107,7 @@ function createSequenceControls(map){
             index--;
             //if past the first attribute, wrap around to last attribute
             index = index < 0 ? 8 : index;
-        }
+        };
 
         //update slider
         $('.range-slider').val(index);
@@ -114,21 +117,22 @@ function createSequenceControls(map){
     });
 
     //input listener for slider
-    $('.range-slider').on('input', function(){
+    $('.range-slider').on('change', function(){
         //get the new index value
         var index = $(this).val();
 
         console.log(index);
-        console.log("made it to range slider");
         //pass new attribute to update symbols
-        updatePropSymbols(map, attributes[index]); 
+        updatePropSymbols(map, attributes[index]);
     });
-}
+};
+
+
 //set up a new function for processing data (where we'll loop thru NORM attributes)
 function processData(data){
     console.log("made it to processdata"); //success
     //empty array to hold attributes
-    var attributes = [];
+
 
     //properties of the first feature in the dataset
     var properties = data.features[0].properties;
@@ -174,23 +178,30 @@ function createPropSymbols(data, map, attributes){
 
 
 function updatePropSymbols(map, attribute){
-    console.log("made it to updateprop"); //success
-    map.eachLayer(function(layer, feature){
-            if (layer.feature && layer.feature.properties[attribute]){
-                        //access feature properties
-                        var props = layer.feature.properties;
-                        
+    map.eachLayer(function(layer){
+        if (layer.feature && layer.feature.properties[attribute]){
+                 //access feature properties
+            var props = layer.feature.properties;
 
-                        //update each feature's radius based on new attribute values
-                        var radius = calcPropRadius(props[attribute]);
-                        layer.setRadius(radius);
+            //update each feature's radius based on new attribute values
+            var radius = calcPropRadius(props[attribute]);
+            layer.setRadius(radius);
 
-                        //add city to popup content string
+            //add city to popup content string
+            var popupContent = "<p><b>City:</b> " + props.City + "</p>";
 
-                        //replace the layer popup
-                    }
-        });        
+            //add formatted attribute to panel content string
+            var year = attribute.split("_")[1];
+            popupContent += "<p><b>Population in " + year + ":</b> " + props[attribute] + " million</p>";
+
+            //replace the layer popup
+            layer.bindPopup(popupContent, {
+                offset: new L.Point(0,-radius)
+              });
+           } //end of if statement
+   });
 }
+
 
 //function to retrieve the data and place it on the map
 function getData(map){
@@ -202,7 +213,7 @@ function getData(map){
         dataType: "json",
         //in the case of a success, run this function:
         success: function(response){
-            console.log("made it to function(respose);")
+            console.log("made it to function response");
             //set up variable attributes and points to processData function
             var attributes = processData(response);
             //points to createPropSymbols
@@ -222,4 +233,3 @@ function getData(map){
 
 
 $(document).ready(createMap);
-
