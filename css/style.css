@@ -1,4 +1,8 @@
-#map {height:800px;
+body{
+    background-color: black;
+}
+
+#map {height:700px;
 width: 100%;
 display: inline-block;}
 

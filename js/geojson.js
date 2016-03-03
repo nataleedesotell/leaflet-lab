@@ -17,10 +17,12 @@ function createMap(){
 }).addTo(map);
     //call getData function
     getData(map);
-};
+}
 
 //add a point to layer with parameters feature & lat long
 function pointToLayer(feature, latlng, attributes) {
+    console.log("made it to pointToLayer");
+    //onsole.log("made it to pointtolayer"); //success
     //attribute we're using for the point's value
     var attribute = attributes[0];
     //check
@@ -42,8 +44,6 @@ function pointToLayer(feature, latlng, attributes) {
     //build popup content string starting with city...Example 2.1 line 24
     var popupContent = "<p><b>State:</b> " + feature.properties.STATES+ "</p>";
 
-    //add formatted attribute to popup content string
-    var year = attribute.split("_")[1];
     //content that will be in the popups
     popupContent += "<p><b>Road Accident Injuries in " + 2003 + ":</b> " + Math.round(feature.properties[attribute]) + " per 100,000 people</p>";
     layer.bindPopup(popupContent, {
@@ -61,82 +61,96 @@ function pointToLayer(feature, latlng, attributes) {
         },
         click: function() {
             //show popup when circle is clicked
-            $("#panel").html(popupContent)
+            $("#panel").html(popupContent);
         }
     });
     //pushes this layer to the map
     return layer;
 
-};
-//create a function for the slider with parameter map
+}
+//Step 1: Create new sequence controls
 function createSequenceControls(map){
+    console.log("made it to createSequenceControls"); //success
     //create range input element (slider)
     $('#panel').append('<input class="range-slider" type="range">');
-    //attibutes for the slider to customize steps, value, etc.
+    
+    //set slider attributes
     $('.range-slider').attr({
-        max: 9,
+        max: 8,
         min: 0,
         value: 0,
         step: 1
-
     });
-
+    
+    //below Example 3.4...add skip buttons
     $('#panel').append('<button class="skip" id="reverse">Reverse</button>');
     $('#panel').append('<button class="skip" id="forward">Skip</button>');
-    //add a reverse button
+    
+    //Below Example 3.5...replace button content with images
     $('#reverse').html('<img src="img/back.png">');
-    ///add a skip button
     $('#forward').html('<img src="img/forward.png">');
-
-
+    
+   //click listener for buttons
     $('.skip').click(function(){
-        //sequence
         //get the old index value
-         var index = $('.range-slider').val();
+        var index = $('.range-slider').val();
 
-
+        //increment or decriment depending on button clicked
         if ($(this).attr('id') == 'forward'){
             index++;
-            //Step 7: if past the last attribute, wrap around to first attribute
+            //if past the last attribute, wrap around to first attribute
             index = index > 8 ? 0 : index;
         } else if ($(this).attr('id') == 'reverse'){
             index--;
-            //Step 7: if past the first attribute, wrap around to last attribute
+            //if past the first attribute, wrap around to last attribute
             index = index < 0 ? 8 : index;
-        };
+        }
 
+        //update slider
+        $('.range-slider').val(index);
+
+        //pass new attribute to update symbols
+        updatePropSymbols(map, attributes[index]);
     });
 
-
-
-    //Step 5: input listener for slider
+    //input listener for slider
     $('.range-slider').on('input', function(){
-        //sequence
+        //get the new index value
         var index = $(this).val();
+
+        console.log(index);
+        console.log("made it to range slider");
+        //pass new attribute to update symbols
+        updatePropSymbols(map, attributes[index]); 
     });
-
-};
-
+}
 //set up a new function for processing data (where we'll loop thru NORM attributes)
-function processData(data) {
-    //set up empty array to hold attributes
+function processData(data){
+    console.log("made it to processdata"); //success
+    //empty array to hold attributes
     var attributes = [];
-    //set up variable properties 
+
+    //properties of the first feature in the dataset
     var properties = data.features[0].properties;
-    //any attribute in properties in the geojson file
-    for (var attribute in properties) {
-        //when "NORM" is found (>-1)
-        if (attribute.indexOf("NORM")>-1) {
-            //push that into our array (i.e., creates an array of NORM2003, NORM2004, etc.)
+
+    //push each attribute name into attributes array
+    for (var attribute in properties){
+        
+        //only take attributes with population values
+        if (attribute.indexOf("NORM") > -1){
             attributes.push(attribute);
-        };
-    };
-    //push these values to the map
+        }
+    }
+
+    //check result
+    console.log(attributes);
+
     return attributes;
-};
+}
 
 //set up function to calculate our proportions
 function calcPropRadius(attValue) {
+    //console.log("made it to calcPropRadius") //success
     //variable scaleFactor is a constant, 50
     var scaleFactor = 50;
     // variable area equals our attribute value * 50
@@ -145,21 +159,42 @@ function calcPropRadius(attValue) {
     var radius = Math.sqrt (area/Math.PI);
     //push that value to the map
     return radius;
-};
+}
 //set up function to create our proportional symbols
-function createPropSymbols(data, map, attributes) {
-    //create marker options
-    L.geoJson (data, {
-        //all the code for this can be found in pointToLayer function so it points there
-        pointToLayer: function(feature, latlng) {
+function createPropSymbols(data, map, attributes){
+    console.log("made it to createPropSymbols"); //success
+    //create a Leaflet GeoJSON layer and add it to the map
+    L.geoJson(data, {
+        pointToLayer: function(feature, latlng){
             return pointToLayer(feature, latlng, attributes);
         }
-        //add them to the map
     }).addTo(map);
-};
+    updatePropSymbols(map, attributes[0]);
+}
+
+
+function updatePropSymbols(map, attribute){
+    console.log("made it to updateprop"); //success
+    map.eachLayer(function(layer, feature){
+            if (layer.feature && layer.feature.properties[attribute]){
+                        //access feature properties
+                        var props = layer.feature.properties;
+                        
+
+                        //update each feature's radius based on new attribute values
+                        var radius = calcPropRadius(props[attribute]);
+                        layer.setRadius(radius);
+
+                        //add city to popup content string
+
+                        //replace the layer popup
+                    }
+        });        
+}
 
 //function to retrieve the data and place it on the map
 function getData(map){
+    console.log("made it to getData"); //success
     //load the data
     
     $.ajax("data/IndiaRoadAccidents.geojson", {
@@ -167,15 +202,18 @@ function getData(map){
         dataType: "json",
         //in the case of a success, run this function:
         success: function(response){
+            console.log("made it to function(respose);")
             //set up variable attributes and points to processData function
             var attributes = processData(response);
             //points to createPropSymbols
             createPropSymbols (response, map, attributes);
             //points to createSequenceControls function to create slider
             createSequenceControls(map, attributes);
+
+            updatePropSymbols(map, attributes);
             }
-        })
-    };
+        });
+    }
 
 
 ///FIFTH INTERACTION OPERATOR///
