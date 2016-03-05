@@ -1,3 +1,8 @@
+//to do:
+//redo geojson with new attribute names
+//go over interactive choropleth instructions again to see where I went wrong
+//figure out how to keep overlay control?
+
 var attributes = [];
 
 //function to instantiate Leaflet map
@@ -24,12 +29,12 @@ function createMap(){
 
 //add a point to layer with parameters feature & lat long
 function pointToLayer(feature, latlng, attributes) {
-    //console.log("made it to pointToLayer");
+    console.log("made it to pointToLayer");
     //onsole.log("made it to pointtolayer"); //success
     //attribute we're using for the point's value
     var attribute = attributes[0];
     //check
-    //console.log(attribute);
+    console.log(attribute);
     //customize what the point looks like
     var options = {
         fillColor: "#FFA900",
@@ -119,7 +124,7 @@ function createSequenceControls(map){
         //get the new index value
         var index = $(this).val();
 
-        //console.log(index);
+        console.log(index);
         //pass new attribute to update symbols
         updatePropSymbols(map, attributes[index]);
     });
@@ -128,7 +133,7 @@ function createSequenceControls(map){
 
 //set up a new function for processing data (where we'll loop thru NORM attributes)
 function processData(data){
-    //console.log("made it to processdata"); //success
+    console.log("made it to processdata"); //success
     //empty array to hold attributes
 
 
@@ -145,7 +150,7 @@ function processData(data){
     }
 
     //check result
-    //console.log(attributes);
+    console.log(attributes);
 
     return attributes;
 }
@@ -164,7 +169,7 @@ function calcPropRadius(attValue) {
 }
 //set up function to create our proportional symbols
 function createPropSymbols(data, map, attributes){
-    //console.log("made it to createPropSymbols"); //success
+    console.log("made it to createPropSymbols"); //success
     //create a Leaflet GeoJSON layer and add it to the map
     L.geoJson(data, {
         pointToLayer: function(feature, latlng){
@@ -190,7 +195,7 @@ function updatePropSymbols(map, attribute){
 
             //add formatted attribute to panel content string
             var year = attribute.split("M")[1];
-            popupContent += "<p><b>Population in " + year + ":</b> " + Math.round(props[attribute]) + " per 100,000 people</p>";
+            popupContent += "<p><b>Injuries in " + year + ":</b> " + Math.round(props[attribute]) + " per 100,000 people</p>";
 
             //replace the layer popup
             layer.bindPopup(popupContent, {
@@ -203,7 +208,7 @@ function updatePropSymbols(map, attribute){
 
 //function to retrieve the data and place it on the map
 function getData(map){
-    //console.log("made it to getData"); //success
+    console.log("made it to getData"); //success
     //load the data
     
     $.ajax("data/IndiaRoadAccidents.geojson", {
@@ -211,7 +216,7 @@ function getData(map){
         dataType: "json",
         //in the case of a success, run this function:
         success: function(response){
-            //console.log("made it to function response");
+            console.log("made it to function response");
             //set up variable attributes and points to processData function
             var attributes = processData(response);
             //points to createPropSymbols
@@ -223,6 +228,7 @@ function getData(map){
             }
         });
     }
+
 
 ///FIFTH INTERACTION OPERATOR///
 
@@ -260,7 +266,9 @@ function getData(map){
 
 // // get color depending on population density value
 // function getColor(d) {
-//     return d > 200  ? '#E31A1C' :
+//     return d > 1000 ? '#800026' :
+//            d > 500  ? '#BD0026' :
+//            d > 200  ? '#E31A1C' :
 //            d > 100  ? '#FC4E2A' :
 //            d > 50   ? '#FD8D3C' :
 //            d > 20   ? '#FEB24C' :
@@ -339,7 +347,7 @@ function getData(map){
 // legend.onAdd = function (map) {
 
 //     var div = L.DomUtil.create('div', 'info legend'),
-//         grades = [0, 10, 20, 50, 100, 200],
+//         grades = [0, 10, 20, 50, 100, 200, 500, 1000],
 //         labels = [],
 //         from, to;
 
