@@ -1,9 +1,8 @@
-//to do:
-//redo geojson with new attribute names
-//go over interactive choropleth instructions again to see where I went wrong
-//figure out how to keep overlay control?
-
-var attributes = [];
+//5th interaction operator is at the bottom of this page commented out 
+//I suspect the issue is with my geojson, but maybe there is an issue with the code too
+//I did not get to the point of creating a control for it, either, so I don't know how to 
+//create the functionality of switching between the two visual isopmorphs
+//yikes
 
 //function to instantiate Leaflet map
 function createMap(){
@@ -24,7 +23,6 @@ function createMap(){
 }).addTo(map);
     //call getData function
     getData(map);
-    getChoroData(map);
 }
 
 //add a point to layer with parameters feature & lat long
@@ -130,12 +128,11 @@ function createSequenceControls(map){
     });
 };
 
-
+//set up empty array attributes
+var attributes = [];
 //set up a new function for processing data (where we'll loop thru NORM attributes)
 function processData(data){
-    console.log("made it to processdata"); //success
     //empty array to hold attributes
-
 
     //properties of the first feature in the dataset
     var properties = data.features[0].properties;
@@ -208,7 +205,6 @@ function updatePropSymbols(map, attribute){
 
 //function to retrieve the data and place it on the map
 function getData(map){
-    console.log("made it to getData"); //success
     //load the data
     
     $.ajax("data/IndiaRoadAccidents.geojson", {
@@ -230,11 +226,30 @@ function getData(map){
     }
 
 
-///FIFTH INTERACTION OPERATOR///
+//fifth interaction operator, filter
+function removeFilter(){
+    var all = document.getElementById('filter-all');
+    var good = document.getElementById('filter-good');
+    var bad = document.getElementById('filter-bad');
+//reset the filter menu
+    all.className = 'active';
+    good.className = '';
+    bad.className = '';
 
+    featureLayer.setFilter(function(){return true;});
 
-// var map = L.map('map').setView([22.5, 80], 5);
+};
 
+// ///FIFTH INTERACTION OPERATOR///
+
+// //function to instantiate Leaflet map
+// function createMap(){
+//     //create the map with a particular center and zoom
+//     var map = L.map('map', {
+//         center: [22.5, 80],
+//         zoom: 5
+//     });
+//     //add OSM base tilelayer
 //     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
 //     //describes layer data
 //     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -244,6 +259,9 @@ function getData(map){
 //     id:'nataleedesotell.p8942221',
 //     accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
 // }).addTo(map);
+//     //call getData function
+//     getChoroData(map);
+// }
 
 
 // // control that shows state info on hover
@@ -256,19 +274,18 @@ function getData(map){
 // };
 
 // info.update = function (props) {
-//     this._div.innerHTML = '<h4>India Road Accident Injuries</h4>' +  (props ?
-//         '<b>' + props.name + '</b><br />' + props.NORM2003 + ' injuries / mi<sup>2</sup>'
+//     this._div.innerHTML = '<h4>India Traffic Injuries</h4>' +  (props ?
+//         '<b>' + props.name + '</b><br />' + props.NORM2003 + ' people / mi<sup>2</sup>'
 //         : 'Hover over a state');
 // };
+// //using NORM2003 as a baseline, will edit to be more interactive later hopefuly?
 
 // info.addTo(map);
 
 
-// // get color depending on population density value
+// // get color depending on injury value
 // function getColor(d) {
-//     return d > 1000 ? '#800026' :
-//            d > 500  ? '#BD0026' :
-//            d > 200  ? '#E31A1C' :
+//     return d > 200  ? '#E31A1C' :
 //            d > 100  ? '#FC4E2A' :
 //            d > 50   ? '#FD8D3C' :
 //            d > 20   ? '#FEB24C' :
@@ -276,6 +293,7 @@ function getData(map){
 //                       '#FFEDA0';
 // }
 
+// //style for the choropleth
 // function style(feature) {
 //     return {
 //         weight: 2,
@@ -287,20 +305,7 @@ function getData(map){
 //     };
 // }
 
-// function getChoroData(map){
-//     console.log("made it to getchoroData"); //success
-//     //load the data
-    
-//     $.ajax("data/IndiaRoadAccidentsChoro.geojson", {
-//         //specify that we expect to get a json file back
-//         dataType: "json",
-//         //in the case of a success, run this function:
-//         success: function(response){
-//             console.log("made it to function response choro");
-
-//             }
-//         });
-//     }
+// //using NORM2003 for now, edit later
 
 // function highlightFeature(e) {
 //     var layer = e.target;
@@ -327,7 +332,6 @@ function getData(map){
 // }
 
 // function zoomToFeature(e) {
-//     console.log("made ot to zoomtofeat")
 //     map.fitBounds(e.target.getBounds());
 // }
 
@@ -339,7 +343,12 @@ function getData(map){
 //     });
 // }
 
-// map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+// geojson = L.geoJson(IndiaRoadAccidentsChoro, {
+//     style: style,
+//     onEachFeature: onEachFeature
+// }).addTo(map);
+
+// map.attributionControl.addAttribution('Injury data &copy; <a href="data.in.gov">India Government Data</a>');
 
 
 // var legend = L.control({position: 'bottomleft'});
@@ -347,7 +356,7 @@ function getData(map){
 // legend.onAdd = function (map) {
 
 //     var div = L.DomUtil.create('div', 'info legend'),
-//         grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+//         grades = [0, 10, 20, 50, 100, 200],
 //         labels = [],
 //         from, to;
 
@@ -365,7 +374,6 @@ function getData(map){
 // };
 
 // legend.addTo(map);
-
 
 
 
