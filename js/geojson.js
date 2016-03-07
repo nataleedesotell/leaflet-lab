@@ -1,8 +1,4 @@
 //5th interaction operator is at the bottom of this page commented out 
-//I suspect the issue is with my geojson, but maybe there is an issue with the code too
-//I did not get to the point of creating a control for it, either, so I don't know how to 
-//create the functionality of switching between the two visual isopmorphs
-//yikes
 
 //function to instantiate Leaflet map
 function createMap(){
@@ -27,12 +23,9 @@ function createMap(){
 
 //add a point to layer with parameters feature & lat long
 function pointToLayer(feature, latlng, attributes) {
-    console.log("made it to pointToLayer");
     //onsole.log("made it to pointtolayer"); //success
     //attribute we're using for the point's value
     var attribute = attributes[0];
-    //check
-    console.log(attribute);
     //customize what the point looks like
     var options = {
         fillColor: "#FFA900",
@@ -121,8 +114,6 @@ function createSequenceControls(map){
     $('.range-slider').on('change', function(){
         //get the new index value
         var index = $(this).val();
-
-        console.log(index);
         //pass new attribute to update symbols
         updatePropSymbols(map, attributes[index]);
     });
@@ -146,15 +137,12 @@ function processData(data){
         }
     }
 
-    //check result
-    console.log(attributes);
 
     return attributes;
 }
 
 //set up function to calculate our proportions
 function calcPropRadius(attValue) {
-    //console.log("made it to calcPropRadius") //success
     //variable scaleFactor is a constant, 50
     var scaleFactor = 50;
     // variable area equals our attribute value * 50
@@ -166,7 +154,6 @@ function calcPropRadius(attValue) {
 }
 //set up function to create our proportional symbols
 function createPropSymbols(data, map, attributes){
-    console.log("made it to createPropSymbols"); //success
     //create a Leaflet GeoJSON layer and add it to the map
     L.geoJson(data, {
         pointToLayer: function(feature, latlng){
@@ -212,7 +199,6 @@ function getData(map){
         dataType: "json",
         //in the case of a success, run this function:
         success: function(response){
-            console.log("made it to function response");
             //set up variable attributes and points to processData function
             var attributes = processData(response);
             //points to createPropSymbols
