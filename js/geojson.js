@@ -1,24 +1,41 @@
+//issues still needing to be addressed:
+//1: forward/reverse buttons won't work in the legend?
+//2. there is no minimum value for 2011?
+
+
+
 //5th interaction operator is at the bottom of this page commented out 
 
 //function to instantiate Leaflet map
 function createMap(){
     //create the map with a particular center and zoom
     var map = L.map('map', {
-        center: [22.5, 80],
+        center: [22.5, 70],
         zoom: 5
+        //layers: [propsymbol, choropleth]
     });
+
+    //attempt at bounding map to south Asia
+    //L.latLngBounds( <LatLng> 5, 60, <LatLng> 31,97);
+
+
     //add OSM base tilelayer
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     //describes layer data
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
     //the max level of zoom allowed
     maxZoom: 6,
-    //my unique id and accessToken
-    id:'nataleedesotell.p8942221',
+
+    //my unique id and accessTokens
+    id:'nataleedesotell.pbicm6p9',
     accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
 }).addTo(map);
     //call getData function
     getData(map);
+}
+
+function createPopup(properties, attribute, layer, radius) {
+    var popupContent
 }
 
 //add a point to layer with parameters feature & lat long
@@ -51,7 +68,7 @@ function pointToLayer(feature, latlng, attributes) {
     layer.on({
         //open a popup when the mouse is over the circle
         mouseover: function() {
-            this.openPopup();
+            this.openPopup(); 
         },
         //close the popup when the mouse is off the popup
         mouseout: function(){
@@ -67,7 +84,34 @@ function pointToLayer(feature, latlng, attributes) {
 
 }
 //Step 1: Create new sequence controls
-function createSequenceControls(map){
+function createSequenceControls(map, attributes){
+    var SequenceControl = L.Control.extend({
+        options: {
+            position: 'topright'
+        },
+
+        onAdd: function(map) {
+
+            var container = L.DomUtil.create('div', 'sequence-control-container');
+            $(container).append('<div id="temporal-legend">')
+            //create range input element (slider)
+            $(container).append('<input class="range-slider" type="range">');
+
+            //add skip buttons
+            $('#reverse').append('<button class="skip" id="reverse" title="Reverse">Reverse</button>');
+            $('#forward').append('<button class="skip" id="forward" title="Forward">Skip</button>');
+            $('#reverse').html('<img src="img/back.png">');
+            $('#forward').html('<img src="img/forward.png">');
+            $(container).on('mousedown dblclick', function(e){
+                L.DomEvent.stopPropagation(e);
+            });
+
+            return container;
+        }
+    });
+
+    map.addControl(new SequenceControl());
+
     //create range input element (slider)
     $('#panel').append('<input class="range-slider" type="range">');
     
@@ -78,14 +122,6 @@ function createSequenceControls(map){
         value: 0,
         step: 1
     });
-    
-    //below Example 3.4...add skip buttons
-    $('#panel').append('<button class="skip" id="reverse">Reverse</button>');
-    $('#panel').append('<button class="skip" id="forward">Skip</button>');
-    
-    //Below Example 3.5...replace button content with images
-    $('#reverse').html('<img src="img/back.png">');
-    $('#forward').html('<img src="img/forward.png">');
     
    //click listener for buttons
     $('.skip').click(function(){
@@ -152,6 +188,93 @@ function calcPropRadius(attValue) {
     //push that value to the map
     return radius;
 }
+
+
+function createLegend(map, attributes) {
+    var LegendControl = L.Control.extend ({
+        options: {
+            position: 'bottomright'
+        },
+        onAdd: function(map) {
+            var container = L.DomUtil.create('div', 'legend-control-container');
+
+            var svg = '<svg id="attribute-legend" width="160px" height="180px">';
+            var circles = {
+            max: 130,
+            mean: 150,
+            min: 170
+        };
+
+        //loop to add each circle and text to svg string
+        for (var circle in circles){
+            //circle string
+            svg += '<circle class="legend-circle" id="' + circle + '" fill="#FFA900" fill-opacity="0.7" stroke="#000000" cx="60"/>';
+            //text string
+            svg += '<text id="' + circle + '-text" x="120" y="' + circles[circle] + '"></text>';
+        };
+        //close svg string
+        svg += "</svg>";
+        //add attribute legend svg to container
+        $(container).append(svg);   
+        return container;
+        }
+    });
+    map.addControl(new LegendControl());
+    updateLegend(map, attributes[0]);
+}
+//Calculate the max, mean, and min values for a given attribute
+function getCircleValues(map, attribute){
+    //start with min at highest possible and max at lowest possible number
+    var min = Infinity,
+        max = -Infinity;
+    map.eachLayer(function(layer){
+        //get the attribute value
+        if (layer.feature){
+            var attributeValue = Number(layer.feature.properties[attribute]);
+            //test for min
+            if (attributeValue < min){
+                min = attributeValue;
+            };
+            //test for max
+            if (attributeValue > max){
+                max = attributeValue;
+            };
+        };
+    });
+    //set mean
+    var mean = (max + min) / 2;
+    //return values as an object
+    return {
+        max: max,
+        mean: mean,
+        min: min
+    };
+};
+
+function updateLegend(map, attribute){
+    //create content for legend
+    var year = attribute.split("M")[1];
+    var content = "<h3><b>" + "Injuries in " + year + "</b></h3>" + "<br>";
+        //replace legend content
+        //get the max, mean, and min values as an object
+    var circleValues = getCircleValues(map, attribute);
+    $('#temporal-legend').html(content);
+
+    for (var key in circleValues){
+        //get the radius
+        var radius = calcPropRadius(circleValues[key]);
+
+        //Step 3: assign the cy and r attributes
+        $('#'+key).attr({
+            cy: 170 - radius,
+            r: radius
+        });
+        //Step 4: add legend text
+        $('#'+key+'-text').text(Math.round(circleValues[key]*100)/100 + "");
+      };
+};
+
+
 //set up function to create our proportional symbols
 function createPropSymbols(data, map, attributes){
     //create a Leaflet GeoJSON layer and add it to the map
@@ -161,11 +284,13 @@ function createPropSymbols(data, map, attributes){
         }
     }).addTo(map);
     updatePropSymbols(map, attributes[0]);
+    
 }
 
 
 function updatePropSymbols(map, attribute){
-    map.eachLayer(function(layer){
+    map.eachLayer(function(layer)
+    {
         if (layer.feature && layer.feature.properties[attribute]){
                  //access feature properties
             var props = layer.feature.properties;
@@ -180,7 +305,7 @@ function updatePropSymbols(map, attribute){
             //add formatted attribute to panel content string
             var year = attribute.split("M")[1];
             popupContent += "<p><b>Injuries in " + year + ":</b> " + Math.round(props[attribute]) + " per 100,000 people</p>";
-
+            updateLegend(map, attribute);
             //replace the layer popup
             layer.bindPopup(popupContent, {
                 offset: new L.Point(0,-radius)
@@ -207,24 +332,37 @@ function getData(map){
             createSequenceControls(map, attributes);
 
             updatePropSymbols(map, attributes);
+            createLegend(map, attributes);
             }
         });
     }
 
 
-//fifth interaction operator, filter
-function removeFilter(){
-    var all = document.getElementById('filter-all');
-    var good = document.getElementById('filter-good');
-    var bad = document.getElementById('filter-bad');
-//reset the filter menu
-    all.className = 'active';
-    good.className = '';
-    bad.className = '';
 
-    featureLayer.setFilter(function(){return true;});
 
-};
+// //PSEUDO-CODE FOR ATTRIBUTE LEGEND
+// 1. Add an `<svg>` element to the legend container
+// 2. Add a `<circle>` element for each of three attribute values: max, mean, and min
+// 3. Assign each `<circle>` element a center and radius based on the dataset max, mean, and min values of the current attribute
+// 4. Create legend text to label each circle
+// 5. Update circle attributes and legend text when the data attribute is changed by the user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ///FIFTH INTERACTION OPERATOR///
 

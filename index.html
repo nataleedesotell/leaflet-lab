@@ -3,16 +3,51 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
-		<title>Leaflet Lab Module 5</title>
+		<title>India Road Accident Injuries</title>
 		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/>
 		<link rel="stylesheet" href="css/style.css">
+		<!-- <title><left> India Road Accident Injuries </left></title> -->
 	</head>
 
 	<body>
+		<!-- <h1><left>India Road Accident Injuries</left></h1> -->
+		<!-- <h2><left> How safe are India's roads? </left></h2 -->
+		<div id="wrapper">
+            <div class="title">India Road Accident Injuries</div> 
+
+            <p class="description">
+            	India has a traffic problem... </br></br>
+            	This map highlights the number of injuries that were reported in each state in India from 2003-2011. Overall, the number of events has ...... </br></br>
+            	<i>"maybe a quote from a newspaper or Indian official"</i></br> - <a href= link to the quote target="_blank">who said the quote</a> their job title
+            </p>
+
+            <p class="context1"<b>What about population increase?</b></br>
+      			Most states did see an increase in population, which would naturally increase the raw total of accident injuries. Using Indian census data from 2001 and 2011, I modeled the population linearly (?) and normalized. Save for the error in using a linear model (population grows more geometrically), these totals reflect the approximate # of injuries per 100,000 people per year.
+            </p>
+                <p class="context2"<b>Why did I make this map?</b></br>
+      			I spent the summer of 2013 in India, and most of my initial culture shock came from the differences in how traffic flows. Indian traffic does not follow most "rules of the road", and instead they depend mostly on instinct and a lot of horn-honking. Despite what looked like chaos from the outside, traffic moved along smoothly and quickly most of the time. In my short time there, I was only in one fender-bender. After reading more about it, it turns out India is one of the most dangerous countries to be on the road. I was interested in how this has changed over time as more and more people purchase vehicles.
+            </p>
+                <p class="context3"><b>Where did the data come from? </b></br>
+            	My primary data source was india's snazzy data.gov.in website. This particular data was collectd by the Transport Research Wing of Ministry of Road Transport & Highways. They are obtained by police departments of the States and Union Territories in India. 
+            </p>
+            <p class="source">Data source: </br>
+                <a href="https://data.gov.in/" target="_blank">Open Government Data (OGD) Platform India</a>,<a href="wikipedia.com">Wherever I got the census data</a></br></br>
+ 
+            	Map author: </br>
+            	Natalee Robson, 2016
+            </p> 
+
+		<video width="400" controls>
+  		<source src="IndiaVideo.mp4" type="video/mp4">
+  		Your browser does not support HTML4 video.
+		</video>        
+        </div>
+
 		<div id="map"></div>
 		<div id="panel"></div>
 		<div id="reverse"></div>
 		<div id="forward"></div>
+		<div id="temporal-legend"></div>
 		<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 		<script type="text/javascript" src="lib/jquery-1.12.0.js"></script>
 		<script type="text/javascript" src="js/geojson.js"></script>
