@@ -1,35 +1,37 @@
 //issues still needing to be addressed:
 //1: forward/reverse buttons won't work in the legend?
-//2. there is no minimum value for 2011?
+//2. finish 5th operator! 
+//3. max bounds?
+//4. Bottom circle in legend different color
 
 
-
-//5th interaction operator is at the bottom of this page commented out 
-
-//function to instantiate Leaflet map
 function createMap(){
+    var prop = L.tileLayer ('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', 
+      //  map.fitBounds([
+        //    [6, 60],
+          //  [36, 97]
+       // ]),
+        {id: 'nataleedesotell.pbicm6p9', 
+        accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA', 
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'}),
+
+        chor   = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {id: 'nataleedesotell.pbicm6p9', accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA', attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'});
+
+
     //create the map with a particular center and zoom
     var map = L.map('map', {
-        center: [21, 75],
-        zoom: 5
-        //layers: [propsymbol, choropleth]
+        center: [20, 78],
+        zoom: 5,
+        layers: [prop, chor]
     });
 
-    //attempt at bounding map to south Asia
-    //L.latLngBounds( <LatLng> 5, 60, <LatLng> 31,97);
+    var maptypes = {
+        "Proportional Symbol Map": prop,
+        "Choropleth Map": chor
+    };
 
+    L.control.layers(maptypes).addTo(map);
 
-    //add OSM base tilelayer
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    //describes layer data
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    //the max level of zoom allowed
-    maxZoom: 6,
-
-    //my unique id and accessTokens
-    id:'nataleedesotell.pbicm6p9',
-    accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
-}).addTo(map);
     //call getData function
     getData(map);
 }

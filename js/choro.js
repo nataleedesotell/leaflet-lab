@@ -11,7 +11,7 @@ function statesData(map){
           var a = L.geoJson(response, {style: style});
 
            var overlayMaps = {
-             "Background Checks": a,
+             "Choropleth View": a,
            };
 
           L.control.layers(null, overlayMaps).addTo(map);
@@ -33,7 +33,7 @@ function getColor(d) {
 
 function style(feature) {
     return {
-        fillColor: getColor(feature.properties.Checks),
+        fillColor: getColor(feature.properties.NORM2003),
         weight: 2,
         opacity: 1,
         color: 'white',
