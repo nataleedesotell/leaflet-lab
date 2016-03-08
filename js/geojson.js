@@ -1,9 +1,7 @@
 //issues still needing to be addressed:
-//1: forward/reverse buttons won't work in the legend
-//2. get 5th operator functioning!!!!
-//3. get video functioning? not a priority though
-//4. how do I bind user to certain area? 
-//5. organize/simplify code
+//1: forward/reverse buttons won't work in the legend?
+//2. there is no minimum value for 2011?
+
 
 
 //5th interaction operator is at the bottom of this page commented out 
