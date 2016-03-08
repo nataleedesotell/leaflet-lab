@@ -12,7 +12,7 @@
 function createMap(){
     //create the map with a particular center and zoom
     var map = L.map('map', {
-        center: [22.5, 70],
+        center: [21, 75],
         zoom: 5
         //layers: [propsymbol, choropleth]
     });
@@ -102,8 +102,8 @@ function createSequenceControls(map, attributes){
             //add skip buttons
             $('#reverse').append('<button class="skip" id="reverse" title="Reverse">Reverse</button>');
             $('#forward').append('<button class="skip" id="forward" title="Forward">Skip</button>');
-            $('#reverse').html('<img src="img/back.png">');
-            $('#forward').html('<img src="img/forward.png">');
+            //$('#reverse').html('<img src="img/back.png">');
+            //$('#forward').html('<img src="img/forward.png">');
             $(container).on('mousedown dblclick', function(e){
                 L.DomEvent.stopPropagation(e);
             });
@@ -195,7 +195,7 @@ function calcPropRadius(attValue) {
 function createLegend(map, attributes) {
     var LegendControl = L.Control.extend ({
         options: {
-            position: 'bottomright'
+            position: 'topright'
         },
         onAdd: function(map) {
             var container = L.DomUtil.create('div', 'legend-control-container');
@@ -210,7 +210,7 @@ function createLegend(map, attributes) {
         //loop to add each circle and text to svg string
         for (var circle in circles){
             //circle string
-            svg += '<circle class="legend-circle" id="' + circle + '" fill="#FFA900" fill-opacity="0.7" stroke="#000000" cx="60"/>';
+            svg += '<circle class="legend-circle" id="' + circle + '" fill="#FFA900" fill-opacity="0.7" stroke="grey" cx="60"/>';
             //text string
             svg += '<text id="' + circle + '-text" x="120" y="' + circles[circle] + '"></text>';
         };
@@ -247,7 +247,7 @@ function getCircleValues(map, attribute){
     var mean = (max + min) / 2;
     //return values as an object
     return {
-        max: max,
+        max:  max,
         mean: mean,
         min: min
     };
@@ -272,7 +272,7 @@ function updateLegend(map, attribute){
             r: radius
         });
         //Step 4: add legend text
-        $('#'+key+'-text').text(Math.round(circleValues[key]*100)/100 + "");
+        $('#'+key+'-text').text(Math.round(circleValues[key]) + " injuries");
       };
 };
 
@@ -338,171 +338,6 @@ function getData(map){
             }
         });
     }
-
-
-
-
-// //PSEUDO-CODE FOR ATTRIBUTE LEGEND
-// 1. Add an `<svg>` element to the legend container
-// 2. Add a `<circle>` element for each of three attribute values: max, mean, and min
-// 3. Assign each `<circle>` element a center and radius based on the dataset max, mean, and min values of the current attribute
-// 4. Create legend text to label each circle
-// 5. Update circle attributes and legend text when the data attribute is changed by the user
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ///FIFTH INTERACTION OPERATOR///
-
-// //function to instantiate Leaflet map
-// function createMap(){
-//     //create the map with a particular center and zoom
-//     var map = L.map('map', {
-//         center: [22.5, 80],
-//         zoom: 5
-//     });
-//     //add OSM base tilelayer
-//     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-//     //describes layer data
-//     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-//     //the max level of zoom allowed
-//     maxZoom: 6,
-//     //my unique id and accessToken
-//     id:'nataleedesotell.p8942221',
-//     accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
-// }).addTo(map);
-//     //call getData function
-//     getChoroData(map);
-// }
-
-
-// // control that shows state info on hover
-// var info = L.control();
-
-// info.onAdd = function (map) {
-//     this._div = L.DomUtil.create('div', 'info');
-//     this.update();
-//     return this._div;
-// };
-
-// info.update = function (props) {
-//     this._div.innerHTML = '<h4>India Traffic Injuries</h4>' +  (props ?
-//         '<b>' + props.name + '</b><br />' + props.NORM2003 + ' people / mi<sup>2</sup>'
-//         : 'Hover over a state');
-// };
-// //using NORM2003 as a baseline, will edit to be more interactive later hopefuly?
-
-// info.addTo(map);
-
-
-// // get color depending on injury value
-// function getColor(d) {
-//     return d > 200  ? '#E31A1C' :
-//            d > 100  ? '#FC4E2A' :
-//            d > 50   ? '#FD8D3C' :
-//            d > 20   ? '#FEB24C' :
-//            d > 10   ? '#FED976' :
-//                       '#FFEDA0';
-// }
-
-// //style for the choropleth
-// function style(feature) {
-//     return {
-//         weight: 2,
-//         opacity: 1,
-//         color: 'white',
-//         dashArray: '3',
-//         fillOpacity: 0.7,
-//         fillColor: getColor(feature.properties.NORM2003)
-//     };
-// }
-
-// //using NORM2003 for now, edit later
-
-// function highlightFeature(e) {
-//     var layer = e.target;
-
-//     layer.setStyle({
-//         weight: 5,
-//         color: '#666',
-//         dashArray: '',
-//         fillOpacity: 0.7
-//     });
-
-//     if (!L.Browser.ie && !L.Browser.opera) {
-//         layer.bringToFront();
-//     }
-
-//     info.update(layer.feature.properties);
-// }
-
-// var geojson;
-
-// function resetHighlight(e) {
-//     geojson.resetStyle(e.target);
-//     info.update();
-// }
-
-// function zoomToFeature(e) {
-//     map.fitBounds(e.target.getBounds());
-// }
-
-// function onEachFeature(feature, layer) {
-//     layer.on({
-//         mouseover: highlightFeature,
-//         mouseout: resetHighlight,
-//         click: zoomToFeature
-//     });
-// }
-
-// geojson = L.geoJson(IndiaRoadAccidentsChoro, {
-//     style: style,
-//     onEachFeature: onEachFeature
-// }).addTo(map);
-
-// map.attributionControl.addAttribution('Injury data &copy; <a href="data.in.gov">India Government Data</a>');
-
-
-// var legend = L.control({position: 'bottomleft'});
-
-// legend.onAdd = function (map) {
-
-//     var div = L.DomUtil.create('div', 'info legend'),
-//         grades = [0, 10, 20, 50, 100, 200],
-//         labels = [],
-//         from, to;
-
-//     for (var i = 0; i < grades.length; i++) {
-//         from = grades[i];
-//         to = grades[i + 1];
-
-//         labels.push(
-//             '<i style="background:' + getColor(from + 1) + '"></i> ' +
-//             from + (to ? '&ndash;' + to : '+'));
-//     }
-
-//     div.innerHTML = labels.join('<br>');
-//     return div;
-// };
-
-// legend.addTo(map);
-
-
-
 
 
 
