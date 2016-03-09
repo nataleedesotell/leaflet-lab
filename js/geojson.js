@@ -1,42 +1,30 @@
 //issues still needing to be addressed:
 //2. max bounds?
-//3. finish context/wording! 
-//4. Text in legend needs to be placed correctly
 //4. Random label chillin at the bottom
-//5. Make sure to comment it all out and make it pretty! use jshint maybe
+//5. comment it all out and make it pretty
 
 
-//function to create the leaflet map
 function createMap(){
-    //set up a variable that holds the info for my proportional symbol map
-    var prop = L.tileLayer ('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', 
-        {id: 'nataleedesotell.pbicm6p9', 
-        accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA', 
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'}),
-    //set up a variable that holds info for my choropleth map for the reexpress 5th operator
-        chor = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {id: 'nataleedesotell.pbicm6p9', accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA', attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'});
-    //create the map with a particular center and zoom on India
+    //create the map with a particular center and zoom
     var map = L.map('map', {
-        center: [20, 78],
-        zoom: 5,
-        //the map includes both layers
-        layers: [prop]
+        center: [20.5, 79],
+        zoom: 5
+        //layers: [propsymbol, choropleth]
     });
-
-    map.options.maxZoom=12;
-    map.options.minZoom=3;
-
-    //variable that includes both map types and labels the radio buttons
-    var maptypes = {
-        "Choropleth Map": chor,
-        "Proportional Symbol Map": prop
-    };
-    //$(document).ready(statesData);
-    //add a control in the upper right with radio buttons for the 2 layers, not collapsed
+    //add openstreetmap base tilelayer
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    //describes layer data
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    //the max level of zoom allowed
+    maxZoom: 6,
+    //my unique id and accessToken
+    id:'nataleedesotell.pbicm6p9',
+    accessToken:'pk.eyJ1IjoibmF0YWxlZWRlc290ZWxsIiwiYSI6ImNpa29uMGNxNTB4d3Z0aWo3bWdubHJ4bGMifQ.1kpv2xbqsnS0sJ9ew0bJIA'
+}).addTo(map);
     //call getData function
     getData(map);
 }
-//add a point to layer with parameters feature & lat long
+//add a point to layer
 function pointToLayer(feature, latlng, attributes) {
     //attribute we're using for the point's value
     var attribute = attributes[0];
@@ -86,7 +74,7 @@ function createSequenceControls(map, attributes){
         onAdd: function(map) {
 
             var container = L.DomUtil.create('div', 'sequence-control-container');
-            $(container).append('<div id="temporal-legend">')
+            $(container).append('<div id="temporal-legend">');
             //create range input element (slider)
             $(container).append('<input class="range-slider" type="range">');
             //add skip buttons
@@ -123,7 +111,7 @@ function createSequenceControls(map, attributes){
             index--;
             //if past the first attribute, wrap around to last attribute
             index = index < 0 ? 8 : index;
-        };
+        }
         //update slider
         $('.range-slider').val(index);
         //pass new attribute to update symbols
@@ -136,7 +124,7 @@ function createSequenceControls(map, attributes){
         //pass new attribute to update symbols
         updatePropSymbols(map, attributes[index]);
     });
-};
+}
 //set up empty array attributes
 var attributes = [];
 //set up a new function for processing data (where we'll loop thru NORM attributes)
@@ -165,6 +153,7 @@ function calcPropRadius(attValue) {
     //push that value to the map
     return radius;
 }
+
 function createLegend(map, attributes) {
     var LegendControl = L.Control.extend ({
         options: {
@@ -172,19 +161,21 @@ function createLegend(map, attributes) {
         },
         onAdd: function(map) {
             var container = L.DomUtil.create('div', 'legend-control-container');
-            var svg = '<svg id="attribute-legend" width="250px" height="100px">';
+
+            var svg = '<svg id="attribute-legend" width="300px" height="190px">';
             var circles = {
             max: 130,
             mean: 150,
             min: 170
         };
+
         //loop to add each circle and text to svg string
         for (var circle in circles){
             //circle string
-            svg += '<circle class="legend-circle" id="' + circle + '" fill="#FFA900" fill-opacity="0.7" stroke="grey" cx="60"/>';
+            svg += '<circle class="legend-circle" id="' + circle + '" fill="#FFA900" fill-opacity="0.7" stroke="#ffffff" cx="85"/>';
             //text string
-            svg += '<text id="' + circle + '-text" x="160" y= ""  "' + circles[circle] + '"></text>';
-        };
+            svg += '<text id="' + circle + '-text" x="140" y="' + circles[circle] + '"></text>';
+        }
         //close svg string
         svg += "</svg>";
         //add attribute legend svg to container
@@ -207,12 +198,12 @@ function getCircleValues(map, attribute){
             //test for min
             if (attributeValue < min){
                 min = attributeValue;
-            };
+            }
             //test for max
             if (attributeValue > max){
                 max = attributeValue;
-            };
-        };
+            }
+        }
     });
     //set mean
     var mean =(max+min)/2;
@@ -222,7 +213,7 @@ function getCircleValues(map, attribute){
         mean:mean,
         min: min
     };
-};
+}
 function updateLegend(map, attribute){
     //create content for legend
     var year = attribute.split("M")[1];
@@ -238,13 +229,13 @@ function updateLegend(map, attribute){
 
         //Step 3: assign the cy and r attributes
         $('#'+key).attr({
-            cy: 95 - radius,
+            cy: 170 - radius,
             r: radius
-        });  
+        });
         //Step 4: add legend text
         $('#'+key+'-text').text(Math.round(circleValues[key]) + " injuries");
-      };
-};
+      }
+}
 //set up function to create our proportional symbols
 function createPropSymbols(data, map, attributes){
     //create a Leaflet GeoJSON layer and add it to the map
