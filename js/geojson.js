@@ -6,7 +6,7 @@
 //5. Make sure to comment it all out and make it pretty! use jshint maybe
 
 
-//function to instantiate map 
+//function to create the leaflet map
 function createMap(){
     //set up a variable that holds the info for my proportional symbol map
     var prop = L.tileLayer ('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', 
@@ -20,8 +20,12 @@ function createMap(){
         center: [20, 78],
         zoom: 5,
         //the map includes both layers
-        layers: [prop, chor]
+        layers: [prop]
     });
+
+    map.options.maxZoom=12;
+    map.options.minZoom=3;
+
     //variable that includes both map types and labels the radio buttons
     var maptypes = {
         "Choropleth Map": chor,
@@ -29,7 +33,6 @@ function createMap(){
     };
     //$(document).ready(statesData);
     //add a control in the upper right with radio buttons for the 2 layers, not collapsed
-    L.control.layers(maptypes, null,{collapsed:false}).addTo(map);
     //call getData function
     getData(map);
 }
@@ -294,43 +297,5 @@ function getData(map){
             }
         });
     }
-
-//fifth interaction operator
-
-// Import GeoJSON data--done (in getData()) and call getData function
-// function statesData(map){
-//     //load the data
-//     $.ajax("data/IndiaRoadAccidentsChoro.geojson", {
-//         dataType: "json",
-//         success: function(response){
-//           console.log(response);
-//           var a = L.geoJson(response, {style: style});
-//           L.control.layers(chor).addTo(map);
-
-//         }
-//     });
-// };
-
-// function getColor(d) {
-//     return d > 200 ? '#084594' :
-//            d > 150  ? '#2171b5' :
-//            d > 100  ? '#4292c6' :
-//            d > 75  ? '#6baed6' :
-//            d > 50   ? '#9ecae1' :
-//            d > 25   ? '#c6dbef' :
-//            d > 1000   ? '#deebf7' :
-//                       '#f7fbff';
-// }
-
-// function style(feature) {
-//     return {
-//         fillColor: getColor(feature.properties.NORM2003),
-//         weight: 2,
-//         opacity: 1,
-//         color: 'white',
-//         dashArray: '3',
-//         fillOpacity: 0.9
-//     };
-// }
 
 $(document).ready(createMap);
